@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".activities.MainActivity"
     android:background="@drawable/crosshair">
 
 
@@ -18,18 +18,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/uparrow"
         tools:ignore="ContentDescription" />
-
-    <Button
-        android:id="@+id/notifyme"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Measure"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.011" />
 
     <ImageView
         android:id="@+id/spot_bottom"
@@ -67,80 +55,90 @@
         app:srcCompat="@drawable/leftarrow"
         tools:ignore="ContentDescription" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/label_group"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/base_margin"
+        android:background="@android:color/white"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Labels -->
-        <TextView
-            android:id="@+id/label_azimuth"
-            style="@style/Label"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/label_azimuth"
+                style="@style/Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/label_azimuth_string" />
+
+            <TextView
+                android:id="@+id/value_azimuth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/base_margin"
+                android:layout_marginLeft="@dimen/base_margin"
+                android:layout_weight="1"
+                android:text="@string/value_format"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/label_pitch"
+                style="@style/Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/label_pitch_string" />
+
+            <TextView
+                android:id="@+id/value_pitch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/value_format"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/label_roll"
+                style="@style/Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/label_roll_string" />
+
+            <TextView
+                android:id="@+id/value_roll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/value_format"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/savebtn"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/label_azimuth_string"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/label_group" />
-
-        <TextView
-            android:id="@+id/label_pitch"
-            style="@style/Label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_pitch_string"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/label_azimuth" />
-
-        <TextView
-            android:id="@+id/label_roll"
-            style="@style/Label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_roll_string"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/label_pitch" />
-
-        <!-- Values -->
-        <TextView
-            android:id="@+id/value_azimuth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/base_margin"
-            android:layout_marginLeft="@dimen/base_margin"
-            android:text="@string/value_format"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-            app:layout_constraintLeft_toRightOf="@id/label_azimuth"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/label_group" />
-
-        <TextView
-            android:id="@+id/value_pitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/value_format"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/value_azimuth" />
-
-        <TextView
-            android:id="@+id/value_roll"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/value_format"
-            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/value_pitch" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:background="@android:color/holo_red_light"
+            android:text="@string/save"
+            android:onClick="save_clicked"/>
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

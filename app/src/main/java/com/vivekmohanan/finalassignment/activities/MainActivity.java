@@ -1,4 +1,4 @@
-package com.vivekmohanan.finalassignment;
+package com.vivekmohanan.finalassignment.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -18,14 +18,21 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
+import com.vivekmohanan.finalassignment.R;
+import com.vivekmohanan.finalassignment.models.SensorValues;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -50,8 +57,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private ImageView mSpotBottom;
     private ImageView mSpotLeft;
     private ImageView mSpotRight;
-    private Button measure;
-    public boolean settrigger = true;
+    private Button save;
 
     private float[] mAccelerometerData = new float[3];
     private float[] mMagnetometerData = new float[3];
@@ -61,15 +67,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // non-zero drift.
     private static final float VALUE_DRIFT = 0.05f;
 
+    int Id = 0;
+
+    //Top to bottom tilt. 0 is flat on a surface
+    public float pitchPrint;
+    //Left to right tilt
+    public float rollPrint;
+
+    SensorValues value;
+
+
+    //private DatabaseReference mDatabase;
+
+    ArrayList<SensorValues> SensorValuesArrayList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+// ...
+        //mDatabase = FirebaseDatabase.getInstance().getReference();
+
         // Lock the orientation to portrait (for now)
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        measure = findViewById(R.id.notifyme);
+
 
         mSpotTop = findViewById(R.id.spot_top);
         mSpotBottom = findViewById(R.id.spot_bottom);
@@ -90,13 +113,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mSensorMagnetometer = mSensorManager.getDefaultSensor(
                 Sensor.TYPE_MAGNETIC_FIELD);
 
-        measure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                settrigger = true;
 
-            }
-        });
     }
 
     @Override
@@ -149,8 +166,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         Intent notificationIntent = new Intent(this,MainActivity.class);
         PendingIntent notificationPendingIntent = PendingIntent.getActivity(this,NOTIFICATION_ID,notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(this,PRIMARY_CHANNEL_ID).setContentTitle("Flat point Detected").setContentTitle("Flat point Detected!!: " + date).setSmallIcon(R.drawable.uparrow).setContentIntent(notificationPendingIntent).setAutoCancel(true);
+        NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(this,PRIMARY_CHANNEL_ID).setContentTitle("Centered").setContentTitle("Centered: " + getTimestamp()).setSmallIcon(R.drawable.uparrow).setContentIntent(notificationPendingIntent).setAutoCancel(true);
         return notifyBuilder;
 
     }
@@ -160,8 +176,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ObjectAnimator Y;
         AnimatorSet animatorXY = new AnimatorSet();
 
-        X = ObjectAnimator.ofFloat(view,"X",4000*rollaxis+450);
-        Y = ObjectAnimator.ofFloat(view,"Y",4000*pitchaxis+700);
+        X = ObjectAnimator.ofFloat(view,"X",4000 * rollaxis + 450);
+        Y = ObjectAnimator.ofFloat(view,"Y",4000 * pitchaxis + 700);
         animatorXY.playTogether(X,Y);
         animatorXY.setDuration(150);
         animatorXY.start();
@@ -207,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         float azimuth = orientationValues[0];
         //Top to bottom tilt. 0 is flat on a surface
         float pitch = orientationValues[1];
+
         //Left to right tilt
         float roll = orientationValues[2];
 
@@ -224,30 +241,92 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         pointerMove(mSpotTop,pitch,roll);
 
+
         if(pitch == 0f && roll == 0f){
-            if(settrigger)
-                send_notification();
-            settrigger = false;
+
+            addSensorValues(pitch,roll);
+            send_notification();
+
         }
 
-       /* if (pitch > 0){
-            mSpotBottom.setAlpha(pitch);
-        } else {
-            mSpotTop.setAlpha(Math.abs(pitch));
-        }
-        if (roll > 0){
-            mSpotLeft.setAlpha(roll);
-        } else {
-            mSpotRight.setAlpha(Math.abs(roll));
-        }*/
+
 
         mTextSensorAzimuth.setText(getResources().getString(R.string.value_format, azimuth));
         mTextSensorPitch.setText(getResources().getString(R.string.value_format, pitch));
         mTextSensorRoll.setText(getResources().getString(R.string.value_format, roll));
+
+        pitchPrint = pitch;
+        BigDecimal pitchtemp = new BigDecimal(Float.toString(pitchPrint));
+        pitchtemp = pitchtemp.setScale(2, BigDecimal.ROUND_HALF_UP);
+        pitchPrint =  pitchtemp.floatValue();
+
+        rollPrint = roll;
+        BigDecimal rolltemp = new BigDecimal(Float.toString(rollPrint));
+        rolltemp = rolltemp.setScale(2, BigDecimal.ROUND_HALF_UP);
+        rollPrint =  rolltemp.floatValue();
+
+    }
+
+    private void addSensorValues(float pitch, float roll) {
+        value = new SensorValues(pitch, roll, getTimestamp());
+        SensorValuesArrayList.add(value);
+
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    /*
+    private void writeToDb(int userId, String pitch, String roll, String time) {
+        //SensorValues value = new SensorValues("X: " + pitch,"Y: " + roll,"Time: " + time);
+
+        mDatabase.child("XY History").child(String.valueOf(userId)).setValue(value);
+        Id ++;
+    }
+*/
+    private String getTimestamp(){
+        Date currentTime = Calendar.getInstance().getTime();
+        String timestamp = String.valueOf(currentTime);
+        return timestamp;
+    }
+
+    public void save_clicked(View view) {
+        addSensorValues(pitchPrint,rollPrint);
+
+        send_notification();
+        Toast toast = Toast.makeText(getApplicationContext(), "Saved X/Y Values to history", Toast.LENGTH_LONG);
+        toast.show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_history){
+            if (!SensorValuesArrayList.isEmpty()){
+                Bundle b = new Bundle();
+                b.putParcelableArrayList("Sensor Values", SensorValuesArrayList);
+                Intent i = new Intent(this, ViewHistory.class);
+
+                i.putExtras(b);
+
+                startActivity(i);
+            } else {
+
+                Toast toast = Toast.makeText(getApplicationContext(), "No History Found", Toast.LENGTH_LONG);
+                toast.show();
+            }
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

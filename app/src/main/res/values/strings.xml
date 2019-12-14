@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Assignment3</string>
+    <string name="app_name">Final Project</string>
 
     <!-- Text view labels for orientation data -->
     <string name="label_azimuth_string">Azmiuth:</string>
@@ -7,4 +7,9 @@
     <string name="label_roll_string">Roll:</string>
 
     <string name="value_format">%1$.2f</string>
+    <string name="y">Y:</string>
+    <string name="x">X:</string>
+    <string name="time">Time:</string>
+    <string name="save">Save</string>
+    <string name="xy_history">XY History</string>
 </resources>
